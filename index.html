@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DevOps Explainer Video Prompt Generator · kona-srinivas-devops</title>
+<meta name="description" content="Pick a DevOps concept and options, and get a complete prompt that makes Claude, ChatGPT or Gemini build an animated explainer video (HTML → MP4) with voice-over timing sync.">
+<meta name="color-scheme" content="dark light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%237c5cff'/%3E%3Cpath d='M22 18l18 14-18 14z' fill='white'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="logo"><svg viewBox="0 0 24 24"><path d="M8 5l11 7-11 7z"/></svg></div>
+  <div class="ttl">
+    <h1>DevOps Explainer Video <span class="grad">Prompt Generator</span></h1>
+    <p>Choose the options, copy the prompt, and paste it into Claude, ChatGPT or Gemini. You get an HTML video that exports to MP4, with voice-over timing sync.</p>
+  </div>
+  <span class="brandtag">kona-srinivas-devops</span>
+</header>
+
+<main class="wrap">
+  <form id="form" class="panel" autocomplete="off" novalidate>
+
+    <fieldset>
+      <legend><span class="n">1</span>Concept</legend>
+      <div class="grid2">
+        <label>Category
+          <select id="category" name="category"></select>
+        </label>
+        <label>Concept
+          <select id="concept" name="concept"></select>
+        </label>
+      </div>
+      <label id="customWrap" hidden>Your concept name
+        <input id="conceptCustom" name="conceptCustom" placeholder="e.g. How Istio sidecar injection works">
+      </label>
+      <p class="hint" id="conceptHint"></p>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="n">2</span>Audience &amp; style</legend>
+      <div class="grid2">
+        <label>Audience level <select id="level" name="level"></select></label>
+        <label>Tone <select id="tone" name="tone"></select></label>
+        <label>Visual theme <select id="theme" name="theme"></select></label>
+        <label>Motion <select id="motion" name="motion"></select></label>
+      </div>
+      <label id="paletteWrap" hidden>Custom palette
+        <input id="palette" name="palette" placeholder="e.g. black #000, orange #ff7a00, white text">
+      </label>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="n">3</span>Format &amp; length</legend>
+      <div class="grid2">
+        <label>Format <select id="format" name="format"></select></label>
+        <label>Length <select id="length" name="length"></select></label>
+      </div>
+      <p class="hint" id="lengthHint"></p>
+    </fieldset>
+
+    <fieldset class="vo">
+      <legend><span class="n">4</span>Voice-over &amp; timing sync</legend>
+      <div class="grid2">
+        <label>Narration <select id="narration" name="narration"></select></label>
+        <label>Language <select id="language" name="language"></select></label>
+        <label>Voice <select id="voice" name="voice"></select></label>
+        <label class="check"><input type="checkbox" id="captions" name="captions"> Burned-in captions</label>
+      </div>
+
+      <div class="seg" role="radiogroup" aria-label="Voice-over timing mode">
+        <label><input type="radio" name="timing" value="auto"><span><b>Auto-timed</b><small>The AI writes the narration with exact timestamps. You record or generate audio to match, then merge it.</small></span></label>
+        <label><input type="radio" name="timing" value="locked"><span><b>Lock to my voice-over</b><small>Paste your timed script or .srt file, and the video is built to your audio.</small></span></label>
+      </div>
+
+      <div id="lockedBox" hidden>
+        <div class="tsbar">
+          <span>Timed script <small>(<code>00:12.0-00:24.0 | Scene | narration</code>, <code>[0:12 - 0:24] text</code>, <code>0:12 | text</code> or .srt)</small></span>
+          <span class="btns">
+            <button type="button" class="mini" id="tsSample">Insert example</button>
+            <label class="mini file">Load .srt / .txt<input type="file" id="tsFile" accept=".srt,.txt,.vtt,text/plain" hidden></label>
+            <label class="mini file">Measure audio<input type="file" id="audioFile" accept="audio/*" hidden></label>
+          </span>
+        </div>
+        <textarea id="timedScript" name="timedScript" rows="8" spellcheck="false" placeholder="00:00.0-00:06.5 | Hook | You press the power button…"></textarea>
+        <div id="tsStatus" class="tsstatus" aria-live="polite"></div>
+        <div class="tswrap"><table id="tsTable" class="tstable" hidden>
+          <thead><tr><th>#</th><th>Start</th><th>End</th><th>Dur</th><th>Words/s</th><th>Scene</th><th>Narration</th></tr></thead>
+          <tbody></tbody>
+        </table></div>
+        <div id="timeline" class="timeline" hidden></div>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="n">5</span>Extra scenes</legend>
+      <div id="extras" class="chips"></div>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="n">6</span>Brand &amp; call to action</legend>
+      <div class="grid2">
+        <label>Brand (header + footer) <input id="brand" name="brand"></label>
+        <label>Instagram handle <input id="handle" name="handle" placeholder="@your.handle"></label>
+        <label>Comment keyword <input id="keyword" name="keyword" placeholder="auto from concept"></label>
+        <label>Hashtags <input id="hashtags" name="hashtags"></label>
+      </div>
+      <p class="hint warn" id="handleWarn" hidden>Instagram usernames can only contain letters, numbers, periods and underscores. Hyphens are not allowed.</p>
+    </fieldset>
+
+    <fieldset>
+      <legend><span class="n">7</span>Details &amp; target AI</legend>
+      <label>Must include <textarea id="mustInclude" name="mustInclude" rows="2" placeholder="Facts, commands or examples you want shown"></textarea></label>
+      <label>Avoid <textarea id="avoid" name="avoid" rows="2" placeholder="Anything to leave out"></textarea></label>
+      <label>Target AI <select id="target" name="target"></select></label>
+      <p class="hint" id="targetHint"></p>
+    </fieldset>
+
+    <div class="formbtns">
+      <button type="button" class="ghost" id="reset">Reset</button>
+      <button type="button" class="ghost" id="share">🔗 Copy share link</button>
+    </div>
+  </form>
+
+  <section class="panel out" aria-label="Generated prompt">
+    <div class="outbar">
+      <div class="stats" id="stats"></div>
+      <div class="btns">
+        <button type="button" class="primary" id="copy">📋 Copy prompt</button>
+        <button type="button" id="dlmd">⬇ .md</button>
+        <button type="button" id="dltxt">⬇ .txt</button>
+      </div>
+    </div>
+    <div class="openin">
+      <span>Open in:</span>
+      <a href="https://claude.ai/new" target="_blank" rel="noopener">Claude ↗</a>
+      <a href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPT ↗</a>
+      <a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini ↗</a>
+      <small>(copy first, then paste)</small>
+    </div>
+    <pre id="output" tabindex="0"></pre>
+  </section>
+</main>
+
+<section class="wrap howto">
+  <h2>How it works</h2>
+  <ol class="steps">
+    <li><b>Choose</b> a concept and options. The prompt updates as you change them.</li>
+    <li><b>Copy</b> the prompt and paste it into Claude, ChatGPT or Gemini.</li>
+    <li><b>Save</b> the HTML file it returns and open it in Chrome. Preview it at 1–4× speed.</li>
+    <li><b>Voice-over:</b> click <i>Copy timed script</i>, record or generate audio from it, then load it into the player or merge it in your editor. To fix the timings to your own audio instead, choose <i>Lock to my voice-over</i> above.</li>
+    <li><b>Download</b> the MP4 (or a silent video plus the merge command) and upload it.</li>
+  </ol>
+  <details>
+    <summary>Merge audio and video yourself (ffmpeg)</summary>
+    <pre>ffmpeg -i video-silent.mp4 -i voiceover.m4a -map 0:v -map 1:a -c:v copy -c:a aac -b:a 192k -shortest final.mp4</pre>
+  </details>
+</section>
+
+<footer class="foot">
+  <span>Made by <b>kona-srinivas-devops</b></span> · <span>Runs entirely in your browser. Nothing is sent to a server.</span>
+</footer>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script src="prompt.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
