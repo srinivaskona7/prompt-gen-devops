@@ -25,37 +25,53 @@
     <fieldset>
       <legend><span class="n">1</span>Concept</legend>
       <div class="grid2">
-        <label>Category
-          <select id="category" name="category"></select>
+        <label>Category <small class="opt">(type anything)</small>
+          <input id="category" name="category" list="categoryList" placeholder="e.g. Kubernetes, Service Mesh, Databases">
+          <datalist id="categoryList"></datalist>
         </label>
-        <label>Concept
-          <select id="concept" name="concept"></select>
+        <label>Concept name <small class="opt">(type anything)</small>
+          <input id="concept" name="concept" list="conceptList" placeholder="e.g. How Istio sidecar injection works" required>
+          <datalist id="conceptList"></datalist>
         </label>
       </div>
-      <label id="customWrap" hidden>Your concept name
-        <input id="conceptCustom" name="conceptCustom" placeholder="e.g. How Istio sidecar injection works">
-      </label>
       <p class="hint" id="conceptHint"></p>
+      <details class="ideas">
+        <summary>💡 Need ideas? Choose from 51 ready-made concepts</summary>
+        <div id="ideas"></div>
+      </details>
     </fieldset>
 
     <fieldset>
-      <legend><span class="n">2</span>Audience &amp; style</legend>
+      <legend><span class="n">2</span>Teaching &amp; style</legend>
       <div class="grid2">
         <label>Audience level <select id="level" name="level"></select></label>
         <label>Tone <select id="tone" name="tone"></select></label>
-        <label>Visual theme <select id="theme" name="theme"></select></label>
+        <label>Teaching style <select id="pedagogy" name="pedagogy"></select></label>
         <label>Motion <select id="motion" name="motion"></select></label>
       </div>
+      <label>Theme <small class="opt">(low-noise themes teach best)</small></label>
+      <div id="themes" class="themes" role="radiogroup" aria-label="Theme"></div>
       <label id="paletteWrap" hidden>Custom palette
         <input id="palette" name="palette" placeholder="e.g. black #000, orange #ff7a00, white text">
       </label>
+      <div class="grid2">
+        <label>Background effects <select id="background" name="background"></select></label>
+        <label class="check"><input type="checkbox" id="retention" name="retention"> Retention devices (recaps, summary frame)</label>
+      </div>
+      <div class="clarity" id="clarity" aria-live="polite"></div>
     </fieldset>
 
     <fieldset>
       <legend><span class="n">3</span>Format &amp; length</legend>
       <div class="grid2">
         <label>Format <select id="format" name="format"></select></label>
-        <label>Length <select id="length" name="length"></select></label>
+        <label>Length (minutes) <small class="opt">(0 = no limit)</small>
+          <input id="minutes" name="minutes" type="number" min="0" max="600" step="0.25" inputmode="decimal" placeholder="e.g. 3 or 2.5">
+        </label>
+      </div>
+      <div class="presets" id="presets">
+        <button type="button" data-m="0.5">30 s</button><button type="button" data-m="1">1 min</button><button type="button" data-m="1.5">90 s</button>
+        <button type="button" data-m="3">3 min</button><button type="button" data-m="5">5 min</button><button type="button" data-m="10">10 min</button><button type="button" data-m="0">No limit</button>
       </div>
       <p class="hint" id="lengthHint"></p>
     </fieldset>
@@ -93,13 +109,24 @@
       </div>
     </fieldset>
 
+    <fieldset class="studio">
+      <legend><span class="n">5</span>Advanced: custom voice-over studio</legend>
+      <label class="toggle"><input type="checkbox" id="studio" name="studio">
+        <span><b>Add a Voice Studio to the video</b><small>Record your own voice with any microphone, or upload audio. The voice is matched to the script word by word, merged, and used in the final download. If no custom audio is ready, the download uses the default voice.</small></span>
+      </label>
+      <div id="studioOpts" class="chips"></div>
+      <div class="flow" id="studioFlow">
+        <span>🎤 Pick a mic</span><i>→</i><span>📜 Read the teleprompter</span><i>→</i><span>🎚 Fit &amp; clean</span><i>→</i><span>✅ Checklist</span><i>→</i><span>🔀 Merge</span><i>→</i><span>⬇ MP4 with your voice</span>
+      </div>
+    </fieldset>
+
     <fieldset>
-      <legend><span class="n">5</span>Extra scenes</legend>
+      <legend><span class="n">6</span>Extra scenes</legend>
       <div id="extras" class="chips"></div>
     </fieldset>
 
     <fieldset>
-      <legend><span class="n">6</span>Brand &amp; call to action</legend>
+      <legend><span class="n">7</span>Brand &amp; call to action</legend>
       <div class="grid2">
         <label>Brand (header + footer) <input id="brand" name="brand"></label>
         <label>Instagram handle <input id="handle" name="handle" placeholder="@your.handle"></label>
@@ -110,7 +137,7 @@
     </fieldset>
 
     <fieldset>
-      <legend><span class="n">7</span>Details &amp; target AI</legend>
+      <legend><span class="n">8</span>Details &amp; target AI</legend>
       <label>Must include <textarea id="mustInclude" name="mustInclude" rows="2" placeholder="Facts, commands or examples you want shown"></textarea></label>
       <label>Avoid <textarea id="avoid" name="avoid" rows="2" placeholder="Anything to leave out"></textarea></label>
       <label>Target AI <select id="target" name="target"></select></label>
@@ -127,7 +154,7 @@
     <div class="outbar">
       <div class="stats" id="stats"></div>
       <div class="btns">
-        <button type="button" class="primary" id="copy">📋 Copy prompt</button>
+        <button type="button" class="primary big" id="copy">📋 Copy prompt</button>
         <button type="button" id="dlmd">⬇ .md</button>
         <button type="button" id="dltxt">⬇ .txt</button>
       </div>
@@ -139,7 +166,11 @@
       <a href="https://gemini.google.com/app" target="_blank" rel="noopener">Gemini ↗</a>
       <small>(copy first, then paste)</small>
     </div>
-    <pre id="output" tabindex="0"></pre>
+    <div class="outbox">
+      <button type="button" class="copyfloat" id="copy2" title="Copy prompt (Ctrl/⌘+Shift+C)">📋 Copy</button>
+      <pre id="output" tabindex="0" aria-label="Generated prompt. Click to select all."></pre>
+    </div>
+    <p class="hint">Tip: click inside the prompt to select all of it, or press <code>Ctrl/⌘ + Shift + C</code> to copy.</p>
   </section>
 </main>
 
